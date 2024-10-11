@@ -1,17 +1,46 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
+import * as Yup from 'yup';
+import { useFormik } from 'formik';
+import { Link, useNavigate } from 'react-router-dom';
 import LogoDark from '../../images/logo/logo-dark.svg';
 import Logo from '../../images/logo/logo.svg';
+import { useDispatch } from 'react-redux';
+import { authLogin } from '../../services/auth/login';
+import { loginSuccess } from '../../store/slices/authSlice';
 
 const SignIn: React.FC = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const validationSchema = Yup.object({
+    username: Yup.string().required('El nombre de usuario es requerido'),
+    password: Yup.string().required('La contraseña es requerida'),
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      username: '',
+      password: '',
+    },
+    validationSchema,
+    onSubmit: async (values) => {
+      try {
+        const { token, user } = await authLogin(values);
+        dispatch(loginSuccess({ token, user }));
+        localStorage.setItem('token', token);        
+        navigate('/dashboard');
+      } catch (error) {
+        console.warn(error)        
+      }
+    },
+  });
+
   return (
     <>
-      {/* <Breadcrumb pageName="Sign In" /> */}
 
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-wrap ">
-          {/*  <div className="hidden w-full xl:block xl:w-1/2">
+          <div className="hidden w-full xl:block xl:w-1/2">
             <div className="py-17.5 px-26 text-center">
               <Link className="mb-5.5 inline-block" to="/">
                 <img className="hidden dark:block" src={Logo} alt="Logo" />
@@ -146,7 +175,7 @@ const SignIn: React.FC = () => {
                 </svg>
               </span>
             </div>
-          </div> */}
+          </div>
 
           <div className="w-full border-stroke dark:border-strokedark xl:w-1/2 xl:border-l-2">
             <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
@@ -155,7 +184,7 @@ const SignIn: React.FC = () => {
                 Iniciar sesión
               </h2>
 
-              <form>
+              <form onSubmit={formik.handleSubmit}>
                 <div className="mb-4">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
                     Nombre usuario
@@ -163,9 +192,16 @@ const SignIn: React.FC = () => {
                   <div className="relative">
                     <input
                       type="string"
+                      name='username'
                       placeholder="Introduce tu nombre de usuario"
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      value={formik.values.username}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                     />
+                    {formik.touched.username && formik.errors.username ? (
+                      <div className="text-red-500 text-sm">{formik.errors.username}</div>
+                    ) : null}
 
                     <span className="absolute right-4 top-4">
                       <svg
@@ -194,9 +230,16 @@ const SignIn: React.FC = () => {
                   <div className="relative">
                     <input
                       type="password"
+                      name='password'
                       placeholder="Introduce la contraseña"
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      value={formik.values.password}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                     />
+                    {formik.touched.password && formik.errors.password ? (
+                      <div className="text-red-500 text-sm">{formik.errors.password}</div>
+                    ) : null}
 
                     <span className="absolute right-4 top-4">
                       <svg
@@ -227,6 +270,7 @@ const SignIn: React.FC = () => {
                     type="submit"
                     value="Sign In"
                     className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
+                    disabled={formik.isSubmitting}
                   />
                 </div>
 

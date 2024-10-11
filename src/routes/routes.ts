@@ -1,4 +1,5 @@
 import { lazy, LazyExoticComponent } from 'react';
+
 type JSXComponent = () => JSX.Element;
 
 interface Route {
@@ -7,23 +8,32 @@ interface Route {
   Component: LazyExoticComponent<JSXComponent> | JSXComponent;
   name: string;
   icon: string;
+  children?: Route[];
 }
 
-const Calendar = lazy(
-  () => import(/* webpackChunkName: "LazyPage1" */ '../pages/Calendar'),
-);
-const Profile = lazy(
-  () => import(/* webpackChunkName: "LazyPage1" */ '../pages/Profile'),
-);
-const Tables = lazy(
-  () => import(/* webpackChunkName: "LazyPage1" */ '../pages/Tables'),
-);
-
-const Settings = lazy(
-  () => import(/* webpackChunkName: "LazyPage1" */ '../pages/Settings'),
-);
+const ECommerce = lazy(() => import('../pages/Dashboard/ECommerce'));
+const Calendar = lazy(() => import('../pages/Calendar'));
+const Profile = lazy(() => import('../pages/Profile'));
+const Tables = lazy(() => import('../pages/Tables'));
+const Settings = lazy(() => import('../pages/Settings'));
 
 export const routes: Route[] = [
+  {
+    to: '/dashboard',
+    path: 'dashboard',
+    Component: ECommerce,
+    name: 'Dashboard',
+    icon: 'dashboard',
+    children: [
+      {
+        to: '/dashboard',
+        path: 'ecommerce',
+        Component: Calendar,
+        name: 'eCommerce',
+        icon: 'shopping_cart',
+      },
+    ],
+  },
   {
     to: '/calendar',
     path: 'calendar',
@@ -39,17 +49,17 @@ export const routes: Route[] = [
     icon: 'person',
   },
   {
-    to: '/Tables',
-    path: 'Tables',
+    to: '/tables',
+    path: 'tables',
     Component: Tables,
     name: 'Tables',
     icon: 'table',
   },
   {
-    to: '/Settings',
-    path: 'Settings',
+    to: '/settings',
+    path: 'settings',
     Component: Settings,
     name: 'Settings',
     icon: 'settings',
-  },
+  }
 ];
