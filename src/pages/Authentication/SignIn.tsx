@@ -7,6 +7,7 @@ import Logo from '../../images/logo/logo.svg';
 import { useDispatch } from 'react-redux';
 import { authLogin } from '../../services/auth/login';
 import { loginSuccess } from '../../store/slices/authSlice';
+import { Loading } from 'notiflix';
 
 const SignIn: React.FC = () => {
   const dispatch = useDispatch();
@@ -25,10 +26,12 @@ const SignIn: React.FC = () => {
     validationSchema,
     onSubmit: async (values) => {
       try {
+        Loading.pulse()
         const { token, user } = await authLogin(values);
         dispatch(loginSuccess({ token, user }));
         localStorage.setItem('token', token);        
         navigate('/dashboard');
+        Loading.remove(1000)
       } catch (error) {
         console.warn(error)        
       }

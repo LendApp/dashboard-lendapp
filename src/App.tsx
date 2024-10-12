@@ -8,6 +8,7 @@ import { RootState } from './store/store';
 import { Suspense, useEffect, useState } from 'react';
 import { revalidateToken } from './store/slices/authSlice';
 import SignUp from './pages/Authentication/SignUp';
+import Breadcrumb from './components/Breadcrumbs/Breadcrumb';
 
 function App() {
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
@@ -35,12 +36,13 @@ function App() {
         { isAuthenticated ? (
         <>
           <Route path="/" element={<Navigate to="/dashboard" />} />
-          {routes.map(({ path, Component }) => (
+          {routes.map(({ path, Component, name }) => (
             <Route
               key={path}
               path={path}
               element={
                 <DefaultLayout>
+                  <Breadcrumb pageName={`${ name }`}/>
                   <Component />
                 </DefaultLayout>
               }

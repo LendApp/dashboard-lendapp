@@ -5,6 +5,7 @@ import UserOne from '../../images/user/user-01.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../store/slices/authSlice';
 import { RootState } from '../../store/store';
+import { Loading } from 'notiflix';
 
 
 const DropdownUser = () => {
@@ -16,9 +17,13 @@ const DropdownUser = () => {
   const user = useSelector((state: RootState) => state.auth.user);
 
   const handleLogout = () => {
-    dispatch(logout()); 
-    localStorage.removeItem('token')
-    navigate('/auth/signin'); 
+    Loading.pulse()
+    setTimeout(() => {
+      localStorage.removeItem('token')
+      dispatch(logout());
+      navigate('/auth/signin');
+      Loading.remove()
+    }, 2000);
   };
 
   return (
@@ -30,7 +35,7 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-          {user?.nombre || 'User Name'}
+            {user?.nombre || 'User Name'}
           </span>
           <span className="block text-xs">{user?.rol || 'User Role'}</span>
         </span>
@@ -134,7 +139,7 @@ const DropdownUser = () => {
               </Link>
             </li>
           </ul>
-          <button 
+          <button
             className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
             onClick={handleLogout}
           >
