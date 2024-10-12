@@ -9,7 +9,7 @@ interface User {
 
 interface AuthState {
   token: string | null;
-  user: User | null;
+  user: User | null ;
   isAuthenticated: boolean;
 }
 
